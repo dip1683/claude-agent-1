@@ -1,0 +1,6 @@
+.env
+data/
+.pageindex/
+*.doc_id
+__pycache__/
+.ipynb_checkpoints/
