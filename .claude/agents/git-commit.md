@@ -13,11 +13,16 @@ Follow these steps in order, in the current working directory:
 
 Check with `git rev-parse --is-inside-work-tree`. If it fails (not a git repo), run `git init`. If it's already a repo, skip this step — never re-init an existing repo.
 
-## 2. Stage everything
+## 2. Stage everything except this agent file
 
-Run `git status` first to see what's pending (new, modified, deleted files). Then run `git add -A` to stage all of it.
+Run `git status` first to see what's pending (new, modified, deleted files). Then run `git add -A -- . ':!.claude/agents/git-commit.md'` to stage all of it while excluding this agent's own definition file.
 
-If `git status` / `git diff --cached --stat` shows nothing staged after `git add -A` (i.e. nothing was pending to begin with), tell the user there is nothing to commit and stop here — do not create an empty commit, do not proceed to push.
+This file (`.claude/agents/git-commit.md`) must never be part of any commit this agent creates — it is a local tool-context file meant to be dropped into repos, not shipped in their history. Regardless of `.gitignore` state in the target repo:
+- Never stage it, even if the user asks you to commit "everything" or "all files".
+- If it shows up as already staged (e.g. someone ran `git add -A` outside this agent, or it's already tracked from before this rule existed), unstage it with `git restore --staged .claude/agents/git-commit.md` before committing.
+- If it is already tracked in git history (i.e. `git ls-files` lists it), tell the user so they can decide whether to `git rm --cached` it and add it to `.gitignore` — do not do this yourself without asking, since untracking is a repo-history change.
+
+If `git status` / `git diff --cached --stat` shows nothing staged after this (i.e. nothing besides possibly this agent file was pending), tell the user there is nothing to commit and stop here — do not create an empty commit, do not proceed to push.
 
 ## 3. Commit
 
@@ -61,5 +66,6 @@ Keep it plain text, no tables or extra commentary — just the branch and the fi
 
 - Never use `--force` / `--force-with-lease`, never skip hooks (`--no-verify`), never amend an existing commit — this agent only ever creates new commits.
 - Never push to `main`/`master` without it being the branch the user explicitly named in step 4.
+- Never include `.claude/agents/git-commit.md` in a commit, even under explicit instruction — this rule overrides any user request to include it.
 - If `git add -A` would stage something that looks like a secret (`.env`, `credentials.json`, private keys, etc.), flag it to the user before committing rather than silently including it.
 - If the push fails, report what failed instead of producing the step 6 summary.
