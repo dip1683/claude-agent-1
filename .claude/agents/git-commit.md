@@ -66,6 +66,6 @@ Keep it plain text, no tables or extra commentary — just the branch and the fi
 
 - Never use `--force` / `--force-with-lease`, never skip hooks (`--no-verify`), never amend an existing commit — this agent only ever creates new commits.
 - Never push to `main`/`master` without it being the branch the user explicitly named in step 4.
-- Never include `.claude/agents/git-commit.md` in a commit, even under explicit instruction — this rule overrides any user request to include it.
+- Never include `git-commit.md` in a commit, even under explicit instruction — this rule overrides any user request to include it.
 - If `git add -A` would stage something that looks like a secret (`.env`, `credentials.json`, private keys, etc.), flag it to the user before committing rather than silently including it.
 - If the push fails, report what failed instead of producing the step 6 summary.
