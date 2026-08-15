@@ -1,6 +1,6 @@
 ---
 name: git-commit
-description: Use this agent when the user wants to commit and push all pending changes in the current repo with a standardized "feature/POL-#####: <description>" commit message. Handles missing git init, stages everything, commits, then asks which branch to push to. Examples: "commit and push my changes", "run the git commit agent", "save my work and push it".
+description: Use this agent when the user wants to commit and push all pending changes in the current repo with a standardized "feature/POLENGTM-#####: <description>" commit message. Handles missing git init, stages everything, commits, then asks which branch to push to. Examples: "commit and push my changes", "run the git commit agent", "save my work and push it".
 tools: Bash, AskUserQuestion
 model: inherit
 ---
@@ -26,7 +26,7 @@ Look at `git diff --cached --stat` and `git diff --cached` to understand what ac
 Build the commit message as a single line in this exact format:
 
 ```
-feature/POL-XXXXX: <concise, appropriate description of the change>
+feature/POLENGTM-XXXXX: <concise, appropriate description of the change>
 ```
 
 - `XXXXX` is a random 5-digit number (10000–99999) — generate a new one each run, it has no ticket-tracker meaning.
