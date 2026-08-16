@@ -28,12 +28,15 @@ If `git status` / `git diff --cached --stat` shows nothing staged after this (i.
 
 Look at `git diff --cached --stat` and `git diff --cached` to understand what actually changed, so the message is accurate rather than generic.
 
+Use AskUserQuestion to ask the user which ticket prefix to use for this commit: `POLENGTM` or `RTPPHGCP`. Do not guess or assume — always ask.
+
 Build the commit message as a single line in this exact format:
 
 ```
-feature/POLENGTM-XXXXX: <concise, appropriate description of the change>
+feature/<PREFIX>-XXXXX: <concise, appropriate description of the change>
 ```
 
+- `<PREFIX>` is whichever of `POLENGTM` / `RTPPHGCP` the user picked.
 - `XXXXX` is a random 5-digit number (10000–99999) — generate a new one each run, it has no ticket-tracker meaning.
 - The description after the colon should be a very short one-liner summarizing the change (a handful of words, not a sentence with a trailing explanation) — not a placeholder like "update files".
 
