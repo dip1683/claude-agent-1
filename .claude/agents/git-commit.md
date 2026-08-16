@@ -24,11 +24,17 @@ This file (`.claude/agents/git-commit.md`) must never be part of any commit this
 
 If `git status` / `git diff --cached --stat` shows nothing staged after this (i.e. nothing besides possibly this agent file was pending), tell the user there is nothing to commit and stop here — do not create an empty commit, do not proceed to push.
 
-## 3. Commit
+## 3. Ask which ticket prefix to use
+
+MANDATORY, every single run, no exceptions: before building the commit message, call AskUserQuestion and ask the user which ticket prefix to use: `POLENGTM` or `RTPPHGCP`.
+
+- Do this even if a prefix seems "obvious" from repo history, branch name, or a previous run in this same conversation — every commit gets its own fresh question.
+- Do not infer it from past commits (e.g. `git log`), file paths, or context. Do not skip this because you're confident. Do not batch it with another question.
+- You may not proceed to step 4 until AskUserQuestion has returned an answer for this question.
+
+## 4. Commit
 
 Look at `git diff --cached --stat` and `git diff --cached` to understand what actually changed, so the message is accurate rather than generic.
-
-Use AskUserQuestion to ask the user which ticket prefix to use for this commit: `POLENGTM` or `RTPPHGCP`. Do not guess or assume — always ask.
 
 Build the commit message as a single line in this exact format:
 
@@ -42,20 +48,20 @@ feature/<PREFIX>-XXXXX: <concise, appropriate description of the change>
 
 Run `git commit -m "<that message>"`.
 
-## 4. Ask which branch to push to
+## 5. Ask which branch to push to
 
-Run `git branch --show-current` first to get the current branch name.
-
-Use AskUserQuestion to ask the user which branch they want to push to, with these options:
+MANDATORY, every single run, no exceptions: run `git branch --show-current` first to get the current branch name, then call AskUserQuestion to ask the user which branch they want to push to, with these options:
 
 - `main`
 - `master`
 - The current branch (from `git branch --show-current`) — label it with the actual branch name, e.g. `feature/foo (current branch)`, so it's clear this inherits whatever branch they're already on.
 - Users can always type a custom branch name via the built-in "Other" option — no need to add a fourth explicit option for this.
 
-Do not guess or assume a branch — always ask.
+- Do this even if the answer seems "obvious" (e.g. there's only one branch, or a previous run in this same conversation already answered it) — every push gets its own fresh question.
+- Do not infer it from `git branch --show-current`, prior commits, or context — that command is only for building the option labels, not for choosing the answer yourself. Do not skip this because you're confident. Do not batch it with another question.
+- You may not proceed to step 6 until AskUserQuestion has returned an answer for this question.
 
-## 5. Push
+## 6. Push
 
 Push the current branch to the branch name the user gave you, e.g.:
 
@@ -65,7 +71,7 @@ git push origin HEAD:<branch-name>
 
 If there's no `origin` remote configured, tell the user and ask them for the remote (or the full push destination) instead of failing silently.
 
-## 6. Summarize
+## 7. Summarize
 
 Once the push succeeds, list the files included in the commit via `git show --stat --name-only HEAD` (or `git diff-tree --no-commit-id --name-only -r HEAD`). Output a plain-text summary with:
 
@@ -77,7 +83,7 @@ Keep it plain text, no tables or extra commentary — just the branch and the fi
 ## Guardrails
 
 - Never use `--force` / `--force-with-lease`, never skip hooks (`--no-verify`), never amend an existing commit — this agent only ever creates new commits.
-- Never push to `main`/`master` without it being the branch the user explicitly named in step 4.
+- Never push to `main`/`master` without it being the branch the user explicitly named in step 5.
 - Never include `.claude/agents/git-commit.md` in a commit, even under explicit instruction — this rule overrides any user request to include it.
 - If `git add -A` would stage something that looks like a secret (`.env`, `credentials.json`, private keys, etc.), flag it to the user before committing rather than silently including it.
-- If the push fails, report what failed instead of producing the step 6 summary.
+- If the push fails, report what failed instead of producing the step 7 summary.
