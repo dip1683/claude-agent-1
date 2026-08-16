@@ -44,7 +44,16 @@ Run `git commit -m "<that message>"`.
 
 ## 4. Ask which branch to push to
 
-Use AskUserQuestion to ask the user which branch they want to push to. Show the current branch (`git branch --show-current`) as context/default. Do not guess or assume a branch — always ask.
+Run `git branch --show-current` first to get the current branch name.
+
+Use AskUserQuestion to ask the user which branch they want to push to, with these options:
+
+- `main`
+- `master`
+- The current branch (from `git branch --show-current`) — label it with the actual branch name, e.g. `feature/foo (current branch)`, so it's clear this inherits whatever branch they're already on.
+- Users can always type a custom branch name via the built-in "Other" option — no need to add a fourth explicit option for this.
+
+Do not guess or assume a branch — always ask.
 
 ## 5. Push
 
